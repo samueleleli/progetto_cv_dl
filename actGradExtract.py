@@ -14,7 +14,7 @@ import open3d as o3d
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from copy import deepcopy
-
+os.makedirs("results/actGradExtraction",exist_ok=True)
 def extract_cls(args):
 
     ###

@@ -17,6 +17,8 @@ from matplotlib.colors import LinearSegmentedColormap
 from gradcam_exp.attgrad import ActivationsAndGradients
 from sklearn.metrics import classification_report, confusion_matrix
 
+os.makedirs("results/classification",exist_ok=True)
+
 def plot_confusion_matrix(cm,
                           target_names,
                           title='Confusion matrix',
@@ -183,9 +185,9 @@ def extract_cls(args):
             gts= np.array(gts)
             predicts= np.concatenate(predicts)
 
-            numpy.savetxt("gts.txt", gts, delimiter=" ",fmt='%d')
-            numpy.savetxt("predicts.txt", predicts, delimiter=" ",fmt='%d')
-            numpy.savetxt("ACT_linear2.txt", ACTIVATIONS, delimiter=" ",fmt='%.6f')
+            numpy.savetxt('results/classification/gts.txt', gts, delimiter=" ",fmt='%d')
+            numpy.savetxt('results/classification/predicts.txt', predicts, delimiter=" ",fmt='%d')
+            numpy.savetxt('results/classification/ACT_linear2.txt', ACTIVATIONS, delimiter=" ",fmt='%.6f')
 
 
             print(classification_report(gts, predicts, target_names=CLASS_MAP))
