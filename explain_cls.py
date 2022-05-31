@@ -608,7 +608,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.base_path = "results/" ###
-    args.dataset = "scanObjectNN" # "modelnet40" ###
+    args.dataset = paramSettings.DATASET # "modelnet40", "scanObjectNN"
 
     if not os.path.exists(args.base_path):
         print("Errore: {} NON ESISTE".format(args.base_path))
