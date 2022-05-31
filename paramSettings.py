@@ -1,1 +1,1 @@
-device="cuda" # "cuda" / "cpu"
+device="cpu" # "cuda" / "cpu"

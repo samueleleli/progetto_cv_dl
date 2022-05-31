@@ -155,7 +155,7 @@ def ply2xmlRenderFile(filename):
 #     "results/activationPlot/a_median__gt4_p4.ply",
 #     ]
 import glob
-filenames= glob.glob("results/toPlot/*")
+filenames= glob.glob("results/gradcamPlot/*")
     
 for filename in filenames:
     ply2xmlRenderFile(filename)

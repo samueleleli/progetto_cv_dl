@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from copy import deepcopy
 
+os.makedirs("results/gradcamPlot",exist_ok=True)
+
 def extract_cls(args):
 
     ###
@@ -26,9 +28,10 @@ def extract_cls(args):
             #selection
             #idx= np.array([430, 2048, 1925, 391, 600, 2320, 2017, 772, 274, 1949, 1132, 1229, 1457, 738, 220, 2179, 604, 2276, 2371, 896, 2013, 505, 896, 1432, 972, 852, 1858, 1672, 1675, 852, 1858, 1672])
             #idx = np.array([2452,563,1297,171,937,2288,128,1614,532,1523,1118,465,1948,1102,372,10,2378,765,394,1859,630,1924,928,460,677, 1197, 2319])
-            idx = np.array([18,128])#677, 1197, 2319])
-            #idx = np.array([578, 571, 235, 165,301,281,121])
+            #idx = np.array([18,128])#677, 1197, 2319])
+            idx = np.array([290, 570, 113, 129])
             #unique and sort
+            #idx = np.array([0,1])
             idx= np.sort(np.unique(idx))
             objs= objs[idx]
             labs = labs[idx]
@@ -206,7 +209,7 @@ def extract_cls(args):
             #         i += 1
 
             #plot gradcam
-            for cls in range(0, 40):
+            for cls in range(0, 14):
                 i=0
                 test_loader = deepcopy(zip(objs, labs))
                 for data, gt in test_loader:
