@@ -134,6 +134,7 @@ results/explain/
 results/actGradExtraction/
 results/activationPlot/
 results/gradcamPlot/
+results/gradcamPlot_xml/
 .idea/
 .DS_Store
 paramSettings.py

@@ -1,5 +1,8 @@
 import numpy as np
 from plyfile import PlyData
+import os
+
+os.makedirs("results/gradcamPlot_xml",exist_ok=True)
 
 def standardize_bbox(pcl, points_per_object):
     pt_indices = np.random.choice(pcl.shape[0], points_per_object, replace=False)
@@ -132,8 +135,8 @@ def ply2xmlRenderFile(filename):
     xml_segments.append(xml_tail)
     
     xml_content = str.join('', xml_segments)
-    
-    with open(filename.split(".")[0] + '.xml', 'w') as f:
+    name = os.path.basename(filename.split(".")[0])
+    with open('results/gradcamPlot_xml/' + name + '.xml', 'w') as f:
         f.write(xml_content)
         
 
