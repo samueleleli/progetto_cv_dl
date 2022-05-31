@@ -26,6 +26,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from util import cal_loss, IOStream
 import sklearn.metrics as metrics
+import paramSettings
 
 
 def _init_():
@@ -232,7 +233,7 @@ if __name__ == "__main__":
     parser.add_argument('--scheduler', type=str, default='cos', metavar='N',
                         choices=['cos', 'step'],
                         help='Scheduler to use, [cos, step]')
-    parser.add_argument('--no_cuda', type=bool, default=False,
+    parser.add_argument('--no_cuda', type=bool, default=paramSettings.NO_CUDA,
                         help='enables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')

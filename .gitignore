@@ -136,3 +136,4 @@ results/activationPlot/
 results/gradcamPlot/
 .idea/
 .DS_Store
+paramSettings.py

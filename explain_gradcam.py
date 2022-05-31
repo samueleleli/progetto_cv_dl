@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from copy import deepcopy
 
+import paramSettings
+
+
 os.makedirs("results/gradcamPlot",exist_ok=True)
 
 def extract_cls(args):
@@ -308,6 +311,6 @@ class args(object):
     k= 20
     emb_dims= 1024
     dropout= 0 #0.5
-    no_cuda= True
+    no_cuda=paramSettings.NO_CUDA
 
 extract_cls(args)

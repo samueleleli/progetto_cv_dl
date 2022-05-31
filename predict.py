@@ -17,6 +17,8 @@ from matplotlib.colors import LinearSegmentedColormap
 from gradcam_exp.attgrad import ActivationsAndGradients
 from sklearn.metrics import classification_report, confusion_matrix
 
+import paramSettings
+
 os.makedirs("results/classification",exist_ok=True)
 
 def plot_confusion_matrix(cm,
@@ -204,7 +206,7 @@ class args(object):
     k= 20
     emb_dims= 1024
     dropout= 0 #0.5
-    no_cuda= True # False # 
+    no_cuda= paramSettings.NO_CUDA
     output_channels= 15 # 40 # 
 
 extract_cls(args)

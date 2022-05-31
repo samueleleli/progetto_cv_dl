@@ -307,6 +307,6 @@ class args(object):
     emb_dims= 1024
     dropout= 0 #0.5
     output_channels= 15
-    no_cuda= True #False
+    no_cuda= paramSettings.NO_CUDA
 
 extract_cls(args)

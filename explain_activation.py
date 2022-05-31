@@ -10,6 +10,8 @@ from model import DGCNN_semseg, DGCNN_cls
 from torch.utils.data import DataLoader
 from gradcam_exp import gradcam
 
+import paramSettings
+
 import open3d as o3d
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -308,6 +310,6 @@ class args(object):
     k= 20
     emb_dims= 1024
     dropout= 0 #0.5
-    no_cuda= True
+    no_cuda=paramSettings.NO_CUDA
 
 extract_cls(args)
