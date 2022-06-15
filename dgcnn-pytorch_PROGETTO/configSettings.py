@@ -1,11 +1,11 @@
-DATASET_TO_PREDICT = "modelnet15" # modelnet15 o modelnet40
+DATASET_TO_PREDICT = "synthcity" # modelnet15 o modelnet40
 DATASET_OBJS = "data/modelnet15/objs.npy"
 DATASET_LABS = "data/modelnet15/GT.txt" 
-OUTPUT_CHANNELS = 15
+OUTPUT_CHANNELS = 9
 
-TRAINING_DATASET = "scanObjectNN"
+TRAINING_DATASET = "synthcity" # scanObjectNN
 
-MODEL_PATH = "models/model.t7"
+MODEL_PATH = "models/model_3_acc.t7" # models/model.t7
 MODEL = 'dgcnn_cls'
 
 

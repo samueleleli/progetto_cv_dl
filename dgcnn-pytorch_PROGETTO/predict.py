@@ -202,6 +202,8 @@ if(configSettings.DATASET_TO_PREDICT == "modelnet15"):
     CLASS_MAP = ['bag','bin','box','cabinet','chair','desk','display','dor','shelf','table','bed','pillow','sink','sofa','toilet']
 elif(configSettings.DATASET_TO_PREDICT == "modelnet40"):
     CLASS_MAP = ['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair','cone','cup','curtain','desk','door','dresser','flower_pot','glass_box','guitar','keyboard','lamp','laptop','mantel','monitor','night_stand','person','piano','plant','radio','range_hood','sink','sofa','stairs','stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
+elif(configSettings.DATASET_TO_PREDICT == "synthcity"):
+    CLASS_MAP = ["building", "car", "natural-ground", "ground", "pole-like", "road", "street-furniture", "tree", "pavement"]
 else: print("there is no CLASS_MAP defined")
 
 

@@ -206,7 +206,7 @@ else: print("there is no CLASS_MAP defined")
 
 
 class args(object):
-    model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7" # 
+    model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7" 
     model= configSettings.MODEL
     k= 20
     emb_dims= 1024
