@@ -11,6 +11,7 @@ from datetime import datetime
 import argparse
 
 import paramSettings
+import configSettings
 
 
 ########################## INPUT #######################
@@ -151,7 +152,29 @@ def explain(layer, dataset, base_path, tipo, balanced, tipo_label, use_pca):
         }
 
         CLASS_MAP = ['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair','cone','cup','curtain','desk','door','dresser','flower_pot','glass_box','guitar','keyboard','lamp','laptop','mantel','monitor','night_stand','person','piano','plant','radio','range_hood','sink','sofa','stairs','stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
-        
+    
+    elif dataset == "modelnet15":
+        colors_per_class = {
+            0: [0, 0, 0],
+            1: [0, 0, 170],
+            2: [0, 0, 255],
+            3: [0, 85, 85],
+            4: [0, 85, 170],
+            5: [0, 170, 0],
+            6: [0, 170, 85],
+            7: [0, 170, 255],
+            8: [0, 255, 85],
+            9: [0, 255, 170],
+            10: [85, 0, 0],
+            11: [85, 0, 85],
+            12: [85, 0, 255],
+            13: [85, 85, 0],
+            14: [85, 85, 170],
+        }
+
+        CLASS_MAP = ['bag','bin','box','cabinet','chair','desk','display','dor','shelf','table','bed','pillow','sink','sofa','toilet']
+
+
     elif dataset == "scanObjectNN":
         colors_per_class = {
             0: [0, 0, 0],
@@ -467,9 +490,12 @@ def explain(layer, dataset, base_path, tipo, balanced, tipo_label, use_pca):
         elif dataset=="synthcity": # 9 classi
             rig = 2
             col = 6
-        elif dataset=="modelnet40": # 9 classi
+        elif dataset=="modelnet40": # 9 classi??  40 classi
             rig = 5
             col = 8
+        elif dataset=="modelnet15": # 9 classi??  15 classi
+            rig = 5
+            col = 3
         elif dataset=="scanObjectNN": # 9 classi
             rig = 5
             col = 3
@@ -608,7 +634,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.base_path = "results/" ###
-    args.dataset = paramSettings.DATASET # "modelnet40", "scanObjectNN"
+    args.dataset = configSettings.TRAINING_DATASET 
 
     if not os.path.exists(args.base_path):
         print("Errore: {} NON ESISTE".format(args.base_path))

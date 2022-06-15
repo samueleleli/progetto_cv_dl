@@ -16,6 +16,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from copy import deepcopy
 
 import paramSettings
+import configSettings
 
 
 os.makedirs("results/gradcamPlot",exist_ok=True)
@@ -25,8 +26,8 @@ def extract_cls(args):
     ###
     if True:
         if True:
-            objs = np.load("data/objs.npy")
-            labs = np.genfromtxt("data/GT.txt", delimiter=' ').astype("int64")
+            objs = np.load(configSettings.DATASET_OBJS)
+            labs = np.genfromtxt(configSettings.DATASET_LABS, delimiter=' ').astype("int64")
 
             #selection
             #idx= np.array([430, 2048, 1925, 391, 600, 2320, 2017, 772, 274, 1949, 1132, 1229, 1457, 738, 220, 2179, 604, 2276, 2371, 896, 2013, 505, 896, 1432, 972, 852, 1858, 1672, 1675, 852, 1858, 1672])
@@ -306,8 +307,8 @@ def extract_cls(args):
 
 
 class args(object):
-    model_path= "models/model.cls.1024.t7"
-    model= 'dgcnn_cls'
+    model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7"
+    model= configSettings.MODEL
     k= 20
     emb_dims= 1024
     dropout= 0 #0.5

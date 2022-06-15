@@ -18,6 +18,7 @@ from gradcam_exp.attgrad import ActivationsAndGradients
 from sklearn.metrics import classification_report, confusion_matrix
 
 import paramSettings
+import configSettings
 
 os.makedirs("results/classification",exist_ok=True)
 
@@ -107,8 +108,8 @@ def plot_confusion_matrix(cm,
 def extract_cls(args):
     if True:
         if True:
-            objs = np.load("data/objs.npy")
-            labs = np.genfromtxt("data/GT.txt", delimiter=' ').astype("int64")
+            objs = np.load(configSettings.DATASET_OBJS)
+            labs = np.genfromtxt(configSettings.DATASET_LABS, delimiter=' ').astype("int64")
 
             test_loader= zip(objs,labs) ##
             #####
@@ -197,16 +198,20 @@ def extract_cls(args):
             print(cm)
             plot_confusion_matrix(cm,CLASS_MAP,title='Confusion matrix',normalize=False,save_path="cm.png")
 
-# CLASS_MAP = ['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair','cone','cup','curtain','desk','door','dresser','flower_pot','glass_box','guitar','keyboard','lamp','laptop','mantel','monitor','night_stand','person','piano','plant','radio','range_hood','sink','sofa','stairs','stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
-CLASS_MAP = ['bag','bin','box','cabinet','chair','desk','display','dor','shelf','table','bed','pillow','sink','sofa','toilet']
+if(configSettings.DATASET_TO_PREDICT == "modelnet15"):
+    CLASS_MAP = ['bag','bin','box','cabinet','chair','desk','display','dor','shelf','table','bed','pillow','sink','sofa','toilet']
+elif(configSettings.DATASET_TO_PREDICT == "modelnet40"):
+    CLASS_MAP = ['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair','cone','cup','curtain','desk','door','dresser','flower_pot','glass_box','guitar','keyboard','lamp','laptop','mantel','monitor','night_stand','person','piano','plant','radio','range_hood','sink','sofa','stairs','stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
+else: print("there is no CLASS_MAP defined")
+
 
 class args(object):
-    model_path= "models/model.t7" # "models/model.cls.1024.t7" # 
-    model= 'dgcnn_cls'
+    model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7" # 
+    model= configSettings.MODEL
     k= 20
     emb_dims= 1024
     dropout= 0 #0.5
     no_cuda= paramSettings.NO_CUDA
-    output_channels = len(CLASS_MAP)  # 15 # 40 
+    output_channels = configSettings.OUTPUT_CHANNELS  # 15 # 40 
 
 extract_cls(args)
