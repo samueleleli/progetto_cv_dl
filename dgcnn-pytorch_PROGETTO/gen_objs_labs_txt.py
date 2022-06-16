@@ -3,11 +3,9 @@ import numpy as np
 from numpy import save
 # save to npy file
 
-objstot = np.load(configSettings.DATASET_OBJS)
+objstot = np.load(configSettings.DATASET_TO_SPLIT)
 objs = objstot[:,0:6]
-save('./data/synthcity/objs_Area_3.npy', objs)
+save(configSettings.OUTPUT_OBJS, objs)
 
-objstot = np.load(configSettings.DATASET_OBJS)
-objstot[:,6].tofile("./data/synthcity/labs_Area_3.txt","\n")
-
-
+# objstot[:,6].tofile("./data/synthcity/labs_Area_3.txt","\n")
+labs = objstot[:,6].astype(int).tofile(configSettings.OUTPUT_LABS,"\n")

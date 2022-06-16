@@ -138,3 +138,4 @@ results/gradcamPlot_xml/
 .idea/
 .DS_Store
 paramSettings.py
+data/

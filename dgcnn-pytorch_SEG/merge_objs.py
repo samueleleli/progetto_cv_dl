@@ -10,7 +10,12 @@ for area in sorted_objs:
     objs = np.append(objs, obj)
     print(area)
 
-np.save('merge.npy',objs)
+# np.save('merge.npy',objs)
+
+
+print(obj.size)
+
+# np.save('merge.npy',objs)
 
 
 
