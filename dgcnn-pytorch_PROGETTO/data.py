@@ -276,7 +276,7 @@ def load_data_semseg_arch9l(partition, test_area):
 def load_data_semseg_sinthcity(partition, test_area):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(BASE_DIR, 'data')
-    META_DIR = os.path.join(DATA_DIR, 'sinthcity', 'meta')
+    META_DIR = os.path.join(DATA_DIR, 'synthcity', 'meta')
     class_names = []
     with open(os.path.join(META_DIR, "class_names.txt"), "r") as fr:
         for l in fr:

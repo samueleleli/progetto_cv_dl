@@ -31,8 +31,8 @@ def knn(x, k):
 
 
 def get_graph_feature(x, k=20, idx=None, dim9=False):
-    batch_size = x.size(0)
-    num_points = x.size(2)
+    batch_size = x.size(0) 
+    num_points = x.size(2) 
     x = x.view(batch_size, -1, num_points)
     if idx is None:
         if dim9 == False:
@@ -358,8 +358,21 @@ class DGCNN_semseg(nn.Module):
         
 
     def forward(self, x):
-        batch_size = x.size(0)
-        num_points = x.size(2)
+        # print("tensore input: ")
+        # print(x)
+
+        # print("size(0):")
+        # print(x.size(0))
+        # print("x(0):")
+        # print(x(0))
+        
+        # print("size(1):")
+        # print(x.size(1))
+        # print("x(1):")
+        # print(x(1))
+
+        batch_size = x.size(0) # non viene utilizzata, dovremmo avere 1?
+        num_points = x.size(2)  # 0-> size = 6   1-> size = 1   default 2
 
         x = get_graph_feature(x, k=self.k, dim9=True)   # (batch_size, 9, num_points) -> (batch_size, 9*2, num_points, k)
         x = self.conv1(x)                       # (batch_size, 9*2, num_points, k) -> (batch_size, 64, num_points, k)

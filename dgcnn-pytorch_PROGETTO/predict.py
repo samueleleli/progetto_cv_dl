@@ -1,8 +1,10 @@
 import os
 import argparse
+from cv2 import exp
 
 import numpy
 import numpy as np
+from sklearn import metrics
 import torch
 import torch.nn as nn
 from data import S3DIS, ArCH, Sinthcity, ModelNet40, ShapeNetPart
@@ -19,8 +21,10 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 import paramSettings
 import configSettings
+from util import IOStream
 
 os.makedirs("results/classification",exist_ok=True)
+
 
 def plot_confusion_matrix(cm,
                           target_names,
@@ -111,7 +115,11 @@ def extract_cls(args):
             objs = np.load(configSettings.DATASET_OBJS)
             labs = np.genfromtxt(configSettings.DATASET_LABS, delimiter=' ').astype("int64")
 
+            objs = objs[np.newaxis,:,:]
+            labs = labs[np.newaxis,:]
+
             test_loader= zip(objs,labs) ##
+
             #####
 
             if not args.no_cuda:
@@ -122,6 +130,8 @@ def extract_cls(args):
             # Try to load models
             if args.model == 'dgcnn_cls':
                 model = DGCNN_cls(args).to(device)
+            elif args.model == 'dgcnn_semseg':
+                model = DGCNN_semseg(args).to(device)
             else:
                 raise Exception("Not implemented")
 
@@ -139,7 +149,7 @@ def extract_cls(args):
 
             #model = model.train()
             model = model.eval()
-            target_layer = model.module.linear2 #linear3 #linear2 #linear1 #conv5
+            target_layer = model.module.conv9 #linear3 #linear2 #linear1 #conv5
             if not args.no_cuda:
                 model = model.cuda()
 
@@ -157,8 +167,11 @@ def extract_cls(args):
 
                 if not args.no_cuda:
                     data = data.cuda()
-
-                data = data.permute(0, 2, 1).to(device)
+                    
+                print(data)
+                data = data.permute(0,2,1).to(device) # permute(0, 2, 1) classificazione  // prima noi (1,0) per fare trasposta
+                print(data)
+                
                 output = activations_and_grads(data)
 
                 am, idx = torch.max(output, 1)
@@ -198,6 +211,155 @@ def extract_cls(args):
             print(cm)
             plot_confusion_matrix(cm,CLASS_MAP,title='Confusion matrix',normalize=False,save_path="cm.png")
 
+def calculate_sem_IoU(pred_np, seg_np, num_classes):
+    I_all = np.zeros(num_classes)
+    U_all = np.zeros(num_classes)
+    for sem_idx in range(seg_np.shape[0]):
+        for sem in range(num_classes):
+            I = np.sum(np.logical_and(pred_np[sem_idx] == sem, seg_np[sem_idx] == sem))
+            U = np.sum(np.logical_or(pred_np[sem_idx] == sem, seg_np[sem_idx] == sem))
+            I_all[sem] += I
+            U_all[sem] += U
+    return I_all / U_all
+
+
+def test_semseg(args, io):
+    all_true_cls = []
+    all_pred_cls = []
+    all_true_seg = []
+    all_pred_seg = []
+    if args.dataset == "S3DIS":
+        total_areas=6
+        args.num_classes = 13
+    elif args.dataset == "ArCH":
+        total_areas=17
+        args.num_classes = 10
+    elif args.dataset == "ArCH9l":
+        total_areas=17
+        args.num_classes = 9
+    elif args.dataset == "synthcity":
+        total_areas=9
+        args.num_classes = 9
+
+    for test_area in range(1,total_areas+1):
+        test_area = str(test_area)
+        if (args.test_area == 'all') or (test_area == args.test_area):
+            if args.dataset == "S3DIS":
+                test_dataset = S3DIS(partition='test', num_points=args.num_points, test_area=test_area)
+                test_loader = DataLoader(test_dataset,
+                                     batch_size=args.test_batch_size, shuffle=False, drop_last=False)
+            elif args.dataset == "ArCH":
+                test_dataset = ArCH(partition='test', num_points=args.num_points, test_area=test_area)
+                test_loader = DataLoader(test_dataset,
+                                         batch_size=args.test_batch_size, shuffle=False, drop_last=False)
+            elif args.dataset == "ArCH9l":
+                test_dataset = ArCH(partition='test', num_points=args.num_points, test_area=test_area, tipo="9l")
+                test_loader = DataLoader(test_dataset,
+                                         batch_size=args.test_batch_size, shuffle=False, drop_last=False)
+            elif args.dataset == "synthcity":
+                test_dataset = Sinthcity(partition='test', num_points=args.num_points, test_area=test_area)
+                test_loader = DataLoader(test_dataset,
+                                         batch_size=args.test_batch_size, shuffle=False, drop_last=False)
+
+
+            device = torch.device("cuda" if args.cuda else "cpu")
+
+            #Try to load models
+            if args.model == 'dgcnn_semseg':
+                model = DGCNN_semseg(args).to(device)
+            else:
+                raise Exception("Not implemented")
+
+            if args.parallel:
+                model = nn.DataParallel(model)
+
+            if args.model_path=="":
+                model.load_state_dict(torch.load(os.path.join(args.model_root, 'model_%s.t7' % test_area)))
+            else:
+                model.load_state_dict(torch.load(os.path.join(args.model_path), map_location=torch.device("cuda" if args.cuda else "cpu")))
+
+            model = model.eval()
+            test_acc = 0.0
+            count = 0.0
+            test_true_cls = []
+            test_pred_cls = []
+            test_true_seg = []
+            test_pred_seg = []
+            cont=0
+            print("Test: {} batches".format(len(test_loader)))
+            with open('checkpoints/' + args.exp_name+ "/prediction.txt", "w") as fw:
+                for data_or, seg, max in test_loader:
+                    if cont % 100 == 0: print(cont)
+                    cont += 1
+                    data, seg = data_or.to(device), seg.to(device)
+                    data = data.permute(0, 2, 1)
+                    batch_size = data.size()[0]
+                    seg_pred = model(data)
+                    #seg_pred, x1, x2, x3 = model(data)
+                    #print(x1.detach().cpu().numpy().shape)  #(2, 64, 4096)  aggiungerei il permute 0,2,1 ...
+                    #("wait...")
+                    seg_pred = seg_pred.permute(0, 2, 1).contiguous()
+                    pred = seg_pred.max(dim=2)[1]
+                    seg_np = seg.cpu().numpy()
+                    pred_np = pred.detach().cpu().numpy()
+                    test_true_cls.append(seg_np.reshape(-1))
+                    test_pred_cls.append(pred_np.reshape(-1))
+                    test_true_seg.append(seg_np)
+                    test_pred_seg.append(pred_np)
+
+                    b, npoints, feats = data_or.shape
+                    #preds = pred_np.reshape(-1)
+                    #gts = seg_np.reshape(-1)
+                    #print(max)
+                    for bb in range(b):
+                        for npp in range(npoints):
+                            feat = data_or[bb,npp,:]
+                            #print(feat)
+                            #print(feat[6])
+                            #print(max[0])
+                            #print(max[0][bb])
+                            px = feat[6] * max[0][bb]     #max[bb,npp,0]
+                            py = feat[7] * max[1][bb]     #max[bb,npp,1]
+                            pz = feat[8] * max[2][bb]     #max[bb,npp,2]
+                            rgb = feat[3:6] * 255.0
+                            pred = int(pred_np[bb,npp])
+                            gt = int(seg_np[bb, npp])
+                            fw.write("{} {} {} {} {} {} {} {}\n".format(px, py, pz, int(rgb[0]), int(rgb[1]), int(rgb[2]), gt, pred))
+            print(cont)
+            test_true_cls = np.concatenate(test_true_cls)
+            test_pred_cls = np.concatenate(test_pred_cls)
+            test_acc = metrics.accuracy_score(test_true_cls, test_pred_cls)
+            avg_per_class_acc = metrics.balanced_accuracy_score(test_true_cls, test_pred_cls)
+            test_true_seg = np.concatenate(test_true_seg, axis=0)
+            test_pred_seg = np.concatenate(test_pred_seg, axis=0)
+            test_ious = calculate_sem_IoU(test_pred_seg, test_true_seg, args.num_classes)
+            outstr = 'Test :: test area: %s, test acc: %.6f, test avg acc: %.6f, test iou: %.6f' % (test_area,
+                                                                                                    test_acc,
+                                                                                                    avg_per_class_acc,
+                                                                                                    np.mean(test_ious))
+            io.cprint(outstr)
+            all_true_cls.append(test_true_cls)
+            all_pred_cls.append(test_pred_cls)
+            all_true_seg.append(test_true_seg)
+            all_pred_seg.append(test_pred_seg)
+            classification_report = metrics.classification_report(test_true_cls, test_pred_cls, target_names=test_dataset.class_names, digits=3)
+            io.cprint(str(classification_report))
+
+
+    if args.test_area == 'all':
+        all_true_cls = np.concatenate(all_true_cls)
+        all_pred_cls = np.concatenate(all_pred_cls)
+        all_acc = metrics.accuracy_score(all_true_cls, all_pred_cls)
+        avg_per_class_acc = metrics.balanced_accuracy_score(all_true_cls, all_pred_cls)
+        all_true_seg = np.concatenate(all_true_seg, axis=0)
+        all_pred_seg = np.concatenate(all_pred_seg, axis=0)
+        all_ious = calculate_sem_IoU(all_pred_seg, all_true_seg, args.num_classes)
+        outstr = 'Overall Test :: test acc: %.6f, test avg acc: %.6f, test iou: %.6f' % (all_acc,
+                                                                                         avg_per_class_acc,
+                                                                                         np.mean(all_ious))
+        io.cprint(outstr)
+
+
 if(configSettings.DATASET_TO_PREDICT == "modelnet15"):
     CLASS_MAP = ['bag','bin','box','cabinet','chair','desk','display','dor','shelf','table','bed','pillow','sink','sofa','toilet']
 elif(configSettings.DATASET_TO_PREDICT == "modelnet40"):
@@ -213,7 +375,43 @@ class args(object):
     k= 20
     emb_dims= 1024
     dropout= 0 #0.5
+    num_classes = configSettings.OUTPUT_CHANNELS
     no_cuda= paramSettings.NO_CUDA
-    output_channels = configSettings.OUTPUT_CHANNELS  # 15 # 40 
+    output_channels = configSettings.OUTPUT_CHANNELS  # 15 # 40
+    # aggiunti per segmentazione
+    exp_name = "test_output"
+    dataset = "synthcity"
+    test_area = '3'
+    test_batch_size = 1
+    eval = True
+    model_root = "models"
+    parallel = True
+    num_points = 4096
+    use_sgd = True
+    lr = 0.001
+    momentum = 0.9
+    scheduler = "cos"
+    seed = 1
+    extract = False
 
-extract_cls(args)
+   
+
+
+os.makedirs("checkpoints/" + args.exp_name,exist_ok=True)
+io = IOStream('checkpoints/' + args.exp_name + '/run.log')
+io.cprint(str(args))
+
+args.cuda = not args.no_cuda and torch.cuda.is_available()
+torch.manual_seed(args.seed)
+if args.cuda:
+    io.cprint(
+        'Using GPU : ' + str(torch.cuda.current_device()) + ' from ' + str(torch.cuda.device_count()) + ' devices')
+    torch.cuda.manual_seed(args.seed)
+else:
+    io.cprint('Using CPU')
+
+
+if(args.model == 'dgcnn_cls'):
+    extract_cls(args)
+elif(args.model == 'dgcnn_semseg'):
+    test_semseg(args,io)
