@@ -138,3 +138,5 @@ results/gradcamPlot_xml/
 .idea/
 .DS_Store
 paramSettings.py
+.vscode/launch.json
+dgcnn-pytorch_PROGETTO/checkpoints/
