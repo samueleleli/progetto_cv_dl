@@ -379,20 +379,20 @@ class args(object):
     no_cuda= paramSettings.NO_CUDA
     output_channels = configSettings.OUTPUT_CHANNELS  # 15 # 40
     # aggiunti per segmentazione
-    exp_name = "test_output"
-    dataset = "synthcity"
-    test_area = '3'
-    test_batch_size = 1
-    eval = True
-    model_root = "models"
-    parallel = True
-    num_points = 4096
-    use_sgd = True
-    lr = 0.001
-    momentum = 0.9
-    scheduler = "cos"
-    seed = 1
-    extract = False
+    exp_name = configSettings.EXP_DIR
+    dataset = configSettings.TEST_DATASET
+    test_area = configSettings.TEST_AREA
+    test_batch_size = configSettings.TEST_BATCH_SIZE
+    eval = configSettings.EVAL
+    model_root = configSettings.MODEL_ROOT
+    parallel = configSettings.PARALLEL
+    num_points = configSettings.NUM_POINTS
+    use_sgd = configSettings.USE_SGD
+    lr = configSettings.LR
+    momentum = configSettings.MOMENTUM
+    scheduler = configSettings.SCHEDULER
+    seed = configSettings.SEED
+    extract = configSettings.EXTRACT
 
    
 
