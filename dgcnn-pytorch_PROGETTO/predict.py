@@ -1,7 +1,7 @@
 import os
 import argparse
 from cv2 import exp
-
+import visual_3d
 import numpy
 import numpy as np
 from sklearn import metrics
@@ -222,7 +222,7 @@ def calculate_sem_IoU(pred_np, seg_np, num_classes):
             U_all[sem] += U
     return I_all / U_all
 
-def uniquify(path):
+def not_unique(path):
     filename, extension = os.path.splitext(path)
     counter = 1
 
@@ -352,13 +352,10 @@ def test_semseg(args, io):
             all_pred_cls.append(test_pred_cls)
             all_true_seg.append(test_true_seg)
             all_pred_seg.append(test_pred_seg)
-
             cm = metrics.confusion_matrix(test_true_cls,test_pred_cls)
             plot_confusion_matrix(cm, CLASS_MAP, title='Confusion matrix', normalize=False, save_path="checkpoints/"+configSettings.EXP_DIR+"/confusion_matrix/cm.png")
             classification_report = metrics.classification_report(test_true_cls, test_pred_cls, target_names=test_dataset.class_names, digits=3)
-
             io.cprint(str(classification_report))
-
             if configSettings.UNIQUE_RESULTS:
                 with open('checkpoints/' + args.exp_name+ "/test_results.txt", "w") as res:
                     res.write("Test: {} batches".format(len(test_loader)) + "\n")
@@ -366,12 +363,13 @@ def test_semseg(args, io):
                     res.write(outstr + "\n")
                     res.write(classification_report)
             else:
-                with open(uniquify('checkpoints/' + args.exp_name+ "/test_results.txt"), "w") as res:
+                with open(not_unique('checkpoints/' + args.exp_name+ "/test_results.txt"), "w") as res:
                     res.write("Test: {} batches".format(len(test_loader)) + "\n")
                     res.write("Num_points: " + str(configSettings.NUM_POINTS) + "\n" + "Batch size: " + str(configSettings.TEST_BATCH_SIZE) + "\n")
                     res.write(outstr + "\n")
                     res.write(classification_report)
-
+            print("Saving Plot...")
+            visual_3d.save_plot_area_3d_pred_map_color(True)
 
     if args.test_area == 'all':
         all_true_cls = np.concatenate(all_true_cls)
