@@ -372,10 +372,10 @@ else: print("there is no CLASS_MAP defined")
 class args(object):
     model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7" # 
     model= configSettings.MODEL
-    k= 20
-    emb_dims= 1024
-    dropout= 0 #0.5
-    num_classes = configSettings.OUTPUT_CHANNELS
+    k = 20 # non utilizzato in segmentazione
+    emb_dims= 1024 # non utilizzato in segmentazione
+    dropout= 0 #0.5   # non utilizzato in segmentazione
+    # num_classes = configSettings.OUTPUT_CHANNELS --- viene settato nel codice del test
     no_cuda= paramSettings.NO_CUDA
     output_channels = configSettings.OUTPUT_CHANNELS  # 15 # 40
     # aggiunti per segmentazione
@@ -383,18 +383,17 @@ class args(object):
     dataset = configSettings.TEST_DATASET
     test_area = configSettings.TEST_AREA
     test_batch_size = configSettings.TEST_BATCH_SIZE
-    eval = configSettings.EVAL
     model_root = configSettings.MODEL_ROOT
     parallel = configSettings.PARALLEL
     num_points = configSettings.NUM_POINTS
-    use_sgd = configSettings.USE_SGD
-    lr = configSettings.LR
-    momentum = configSettings.MOMENTUM
-    scheduler = configSettings.SCHEDULER
     seed = configSettings.SEED
-    extract = configSettings.EXTRACT
+    # extract = configSettings.EXTRACT
+    # eval = configSettings.EVAL
+    lr = configSettings.LR
+    use_sgd = configSettings.USE_SGD
+    scheduler = configSettings.SCHEDULER
+    momentum = configSettings.MOMENTUM
 
-   
 
 
 os.makedirs("checkpoints/" + args.exp_name,exist_ok=True)
