@@ -296,6 +296,7 @@ def test_semseg(args, io):
             test_pred_seg = []
             cont=0
             print("Test: {} batches".format(len(test_loader)))
+            print("Num_points: " + str(configSettings.NUM_POINTS) + "\n" + "Batch size: " + str(configSettings.TEST_BATCH_SIZE) + "\n")
             with open('checkpoints/' + args.exp_name+ "/prediction.txt", "w") as fw:
                 for data_or, seg, max in test_loader:
                     if cont % 100 == 0: print(cont)
