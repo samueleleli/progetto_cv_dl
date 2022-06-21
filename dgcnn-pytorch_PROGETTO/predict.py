@@ -342,7 +342,11 @@ def test_semseg(args, io):
             all_pred_cls.append(test_pred_cls)
             all_true_seg.append(test_true_seg)
             all_pred_seg.append(test_pred_seg)
+
+            cm = metrics.confusion_matrix(test_true_cls,test_pred_cls)
+            plot_confusion_matrix(cm, CLASS_MAP, title='Confusion matrix', normalize=False, save_path="checkpoints/"+configSettings.EXP_DIR+"/confusion_matrix/cm.png")
             classification_report = metrics.classification_report(test_true_cls, test_pred_cls, target_names=test_dataset.class_names, digits=3)
+
             io.cprint(str(classification_report))
 
 
@@ -397,6 +401,7 @@ class args(object):
 
 
 os.makedirs("checkpoints/" + args.exp_name,exist_ok=True)
+os.makedirs("checkpoints/"+args.exp_name+"/confusion_matrix",exist_ok=True)
 io = IOStream('checkpoints/' + args.exp_name + '/run.log')
 io.cprint(str(args))
 
