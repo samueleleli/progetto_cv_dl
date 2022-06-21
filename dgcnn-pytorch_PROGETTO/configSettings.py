@@ -22,6 +22,8 @@ NUM_POINTS = 4096 # cosa indica? l'intorno da considerare per convoluzione?
 SEED = 1 # serve per pytorch CUDA
 EXTRACT = False # serve nel main sem_seg per far partire il codice extract
 EVAL = True # serve nel main sem_seg per far partire il codice di test
+UNIQUE_RESULTS = False # serve per scegliere se sovrascrivere ogni volta il file txt dei risultati o creare ogni volta un nuovo file
+
 
 # variabili per TRAINING segmentazione (che noi non facciamo)
 TRAINING_DATASET = "synthcity" # scanObjectNN

@@ -222,6 +222,15 @@ def calculate_sem_IoU(pred_np, seg_np, num_classes):
             U_all[sem] += U
     return I_all / U_all
 
+def uniquify(path):
+    filename, extension = os.path.splitext(path)
+    counter = 1
+
+    while os.path.exists(path):
+        path = filename + " (" + str(counter) + ")" + extension
+        counter += 1
+
+    return path
 
 def test_semseg(args, io):
     all_true_cls = []
@@ -348,6 +357,15 @@ def test_semseg(args, io):
             classification_report = metrics.classification_report(test_true_cls, test_pred_cls, target_names=test_dataset.class_names, digits=3)
 
             io.cprint(str(classification_report))
+
+            if configSettings.UNIQUE_RESULTS:
+                with open('checkpoints/' + args.exp_name+ "/test_results.txt", "w") as res:
+                    res.write(outstr + "\n")
+                    res.write(classification_report)
+            else:
+                with open(uniquify('checkpoints/' + args.exp_name+ "/test_results.txt"), "w") as res:
+                    res.write(outstr + "\n")
+                    res.write(classification_report)
 
 
     if args.test_area == 'all':
