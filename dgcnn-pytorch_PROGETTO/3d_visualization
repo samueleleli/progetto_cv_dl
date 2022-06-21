@@ -2,13 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import proj3d
 
-
-def clamp(x): 
-  return max(0, min(x, 255))
-
 esa = []
 
-data = np.load('drive/MyDrive/Progetto_CV&DL/dgcnn-pytorch_SEG/data/sinthcity-npy/sinthcity/Area_3_Area_3.npy')
+data = np.load('/data/sinthcity-npy/sinthcity/Area_3_Area_3.npy')
 x = data[:, 0]
 y = data[:, 1]
 z = data[:, 2]
@@ -45,7 +41,7 @@ for color in data:
   elif color[6] == 8:
     esa.append("#00ffe5")
 '''
-  esa.append("#{0:02x}{1:02x}{2:02x}".format(clamp(int(color[3])), clamp(int(color[4])), clamp(int(color[5]))))
+  esa.append("#{0:02x}{1:02x}{2:02x}".format(int(color[3]), int(color[4]), int(color[5])))
 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(111, projection='3d')
