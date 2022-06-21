@@ -360,10 +360,14 @@ def test_semseg(args, io):
 
             if configSettings.UNIQUE_RESULTS:
                 with open('checkpoints/' + args.exp_name+ "/test_results.txt", "w") as res:
+                    res.write("Test: {} batches".format(len(test_loader)) + "\n")
+                    res.write("Num_points: " + configSettings.NUM_POINTS + "\n" + "Batch size: " + configSettings.TEST_BATCH_SIZE + "\n")
                     res.write(outstr + "\n")
                     res.write(classification_report)
             else:
                 with open(uniquify('checkpoints/' + args.exp_name+ "/test_results.txt"), "w") as res:
+                    res.write("Test: {} batches".format(len(test_loader)) + "\n")
+                    res.write("Num_points: " + configSettings.NUM_POINTS + "\n" + "Batch size: " + configSettings.TEST_BATCH_SIZE + "\n")
                     res.write(outstr + "\n")
                     res.write(classification_report)
 
