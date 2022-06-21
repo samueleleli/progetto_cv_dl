@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import proj3d
 
 esa = []
 
-data = np.load('/data/sinthcity-npy/sinthcity/Area_3_Area_3.npy')
+data = np.load('data/sinthcity-npy/sinthcity/Area_3_Area_3.npy')
 x = data[:, 0]
 y = data[:, 1]
 z = data[:, 2]
