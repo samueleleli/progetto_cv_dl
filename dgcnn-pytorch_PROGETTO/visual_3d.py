@@ -23,7 +23,7 @@ def save_plot_area_3d_real_color():
     for color in data:
         esa.append("#{0:02x}{1:02x}{2:02x}".format(int(color[3]), int(color[4]), int(color[5])))
 
-    ax.scatter(x, y, z, c=esa)
+    ax.scatter(x, y, z, c=esa, s=0.1)
     # plt.show()
     plt.savefig("checkpoints/plot_output/real_colors.png")
 
@@ -34,12 +34,12 @@ def save_plot_area_3d_pred_map_color(predict):
     if predict:
         os.makedirs("checkpoints/" + configSettings.EXP_DIR + "/plot_output_pred/", exist_ok=True)
         data = np.loadtxt("checkpoints/" + configSettings.EXP_DIR + "/prediction.txt")
-        output_file = "checkpoints/" + configSettings.EXP_DIR + "/plot_output_pred/" + "color_map_predict.png"
+        output_file = "checkpoints/" + configSettings.EXP_DIR + "/plot_output_pred/" + "color_map_predict_label.png"
         index = 7
     else:
         os.makedirs("checkpoints/plot_output/", exist_ok=True)
         data = np.load('data/sinthcity-npy/sinthcity/Area_3_Area_3.npy')
-        output_file = "checkpoints/plot_output/color_map_real.png"
+        output_file = "checkpoints/plot_output/color_map_real_label.png"
         index = 6
 
     building_color_0 = "#5c5c5c0D"  # marrone trasparente
@@ -79,7 +79,7 @@ def save_plot_area_3d_pred_map_color(predict):
         elif color[index] == 8:
             esa.append(pavement_color_8)
 
-    ax.scatter(x, y, z, c=esa)
+    ax.scatter(x, y, z, c=esa, s=0.1)
     building_patch = mpatches.Patch(color=building_color_0, label='Building')
     car_patch = mpatches.Patch(color=car_color_1, label='Car')
     natural_ground_patch = mpatches.Patch(color=natural_ground_color_2, label='Natural ground')
@@ -93,3 +93,5 @@ def save_plot_area_3d_pred_map_color(predict):
                        street_forniture_patch, tree_patch, pavement_patch], loc='upper left')
 
     plt.savefig(output_file)
+
+#save_plot_area_3d_pred_map_color(False)
