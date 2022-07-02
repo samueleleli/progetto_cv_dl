@@ -18,11 +18,17 @@ from copy import deepcopy
 import configSettings
 
 os.makedirs("results/actGradExtraction",exist_ok=True)
-def extract_cls(args):
+def extract_semseg(args):
 
     ###
     if True:
         if True:
+            total_areas = 9
+            args.num_classes = 9
+            test_dataset = Sinthcity(partition='test', num_points=args.num_points, test_area=args.test_area)
+            test_loader = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False, drop_last=False)
+
+            '''
             objs = np.load(configSettings.DATASET_OBJS)
             labs = np.genfromtxt(configSettings.DATASET_LABS, delimiter=' ').astype("int64")
 
@@ -37,11 +43,13 @@ def extract_cls(args):
             objs= objs[idx]
             labs = labs[idx]
 
-            test_loader = zip(objs, labs)  ##
+            test_loader = zip(objs, labs)
 
             directory="plotNEW0\\"
-            preds = np.genfromtxt("results/classification/predicts.txt", delimiter=' ').astype("int64")
-            preds= preds[idx]
+            '''
+                  
+            preds = np.genfromtxt('checkpoints/' + args.exp_name+ "/prediction.txt", delimiter=' ').astype("int64")
+            # preds= preds[idx]
 
             #####
             if not args.no_cuda:
@@ -50,13 +58,13 @@ def extract_cls(args):
                 device = torch.device("cpu")
             
             # Try to load models
-            if args.model == 'dgcnn_cls':
-                model = DGCNN_cls(args).to(device)
+            if args.model == 'dgcnn_semseg':
+                model = DGCNN_semseg(args).to(device)
             else:
                 raise Exception("Not implemented")
             
             model = nn.DataParallel(model)
-            
+
             print(os.path.join(args.model_path))
             if args.model_path == "":
                 print(os.path.join(args.model_root, 'model_%s.t7' % test_area))
@@ -71,11 +79,11 @@ def extract_cls(args):
             
             if not args.no_cuda:
                 cam = gradcam.GradCAM(model=model,
-                                      target_layer=model.module.conv5,
+                                      target_layer=model.module.conv9,
                                       use_cuda=True)
             else:
                 cam = gradcam.GradCAM(model=model,
-                                      target_layer=model.module.conv5,
+                                      target_layer=model.module.conv9,
                                       use_cuda=False)
             
             print("Model defined...")
@@ -304,12 +312,28 @@ def extract_cls(args):
 
 
 class args(object):
-    model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7"
+    model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7" # 
     model= configSettings.MODEL
-    k= 20
-    emb_dims= 1024
-    dropout= 0 #0.5
-    output_channels=configSettings.OUTPUT_CHANNELS
+    k = 20 # non utilizzato in segmentazione
+    emb_dims= 1024 # non utilizzato in segmentazione
+    dropout= 0 #0.5   # non utilizzato in segmentazione
+    # num_classes = configSettings.OUTPUT_CHANNELS --- viene settato nel codice del test
     no_cuda= paramSettings.NO_CUDA
+    output_channels = configSettings.OUTPUT_CHANNELS  # 15 # 40
+    # aggiunti per segmentazione
+    exp_name = configSettings.EXP_DIR
+    dataset = configSettings.TEST_DATASET
+    test_area = configSettings.TEST_AREA
+    test_batch_size = configSettings.TEST_BATCH_SIZE
+    model_root = configSettings.MODEL_ROOT
+    parallel = configSettings.PARALLEL
+    num_points = configSettings.NUM_POINTS
+    seed = configSettings.SEED
+    # extract = configSettings.EXTRACT
+    # eval = configSettings.EVAL
+    lr = configSettings.LR
+    use_sgd = configSettings.USE_SGD
+    scheduler = configSettings.SCHEDULER
+    momentum = configSettings.MOMENTUM
 
-extract_cls(args)
+extract_semseg(args)

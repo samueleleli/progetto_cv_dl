@@ -36,13 +36,15 @@ def save_plot_area_3d_pred_map_color(predict):
         data = np.loadtxt("checkpoints/" + configSettings.EXP_DIR + "/prediction.txt")
         output_file = "checkpoints/" + configSettings.EXP_DIR + "/plot_output_pred/" + "color_map_predict_label.png"
         index = 7
+        building_color_0 = "#5c5c5c99"  # grigio trasparente #5c5c5ccc (80% opacità) # #5c5c5c80 (50% opacità) #5c5c5c99 60%
     else:
         os.makedirs("checkpoints/plot_output/", exist_ok=True)
         data = np.load('data/sinthcity-npy/sinthcity/Area_3_Area_3.npy')
         output_file = "checkpoints/plot_output/color_map_real_label.png"
         index = 6
+        building_color_0 = "#5c5c5c33"  # grigio trasparente #5c5c5c33 (20% opacità)
 
-    building_color_0 = "#5c5c5c0D"  # marrone trasparente
+    
     car_color_1 = "#fa0202"  # rosso
     natural_ground_color_2 = "#faa243"  # marroncino
     ground_color_3 = "#60849e"  # blu chiaro
@@ -94,4 +96,6 @@ def save_plot_area_3d_pred_map_color(predict):
 
     plt.savefig(output_file)
 
-#save_plot_area_3d_pred_map_color(False)
+# save_plot_area_3d_real_color()
+# save_plot_area_3d_pred_map_color(False)
+# save_plot_area_3d_pred_map_color(True)

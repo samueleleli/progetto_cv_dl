@@ -161,8 +161,8 @@ def extract_cls(args):
                 data = data.permute(0, 2, 1).to(device)
                 output = activations_and_grads(data)
 
-                am, idx = torch.max(output, 1)
-                output = idx
+                am, idx = torch.max(output, 1) # torch.max prende valore massimo tensore
+                output = idx # idx indice (posizione) del valore massimo
                 #output = torch.argmax(output.squeeze())
 
                 #model.zero_grad()

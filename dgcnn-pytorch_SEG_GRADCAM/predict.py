@@ -149,7 +149,7 @@ def extract_cls(args):
 
             #model = model.train()
             model = model.eval()
-            target_layer = model.module.conv9 #linear3 #linear2 #linear1 #conv5
+            target_layer = model.module.conv5 #linear3 #linear2 #linear1 #conv5
             if not args.no_cuda:
                 model = model.cuda()
 
@@ -288,6 +288,9 @@ def test_semseg(args, io):
                 model.load_state_dict(torch.load(os.path.join(args.model_path), map_location=torch.device("cuda" if args.cuda else "cpu")))
 
             model = model.eval()
+            target_layer = model.module.conv9 
+            activations_and_grads = ActivationsAndGradients(model, target_layer, None)
+            ACTIVATIONS = []
             test_acc = 0.0
             count = 0.0
             test_true_cls = []
@@ -303,6 +306,15 @@ def test_semseg(args, io):
                     cont += 1
                     data, seg = data_or.to(device), seg.to(device)
                     data = data.permute(0, 2, 1)
+
+                    output = activations_and_grads(data)
+                    output = output.mean(2)
+                    am, idx = torch.max(output, 1) # torch.max prende valore massimo tensore
+                    output = idx # idx indice (posizione) del valore massimo
+                    activations = activations_and_grads.activations[-1].cpu().data.numpy()
+                    activations = activations.mean(2)
+                    ACTIVATIONS.append(activations)
+
                     batch_size = data.size()[0]
                     seg_pred = model(data)
                     #seg_pred, x1, x2, x3 = model(data)
@@ -335,6 +347,10 @@ def test_semseg(args, io):
                             pred = int(pred_np[bb,npp])
                             gt = int(seg_np[bb, npp])
                             fw.write("{} {} {} {} {} {} {} {}\n".format(px, py, pz, int(rgb[0]), int(rgb[1]), int(rgb[2]), gt, pred))
+            
+            ACTIVATIONS = np.concatenate(ACTIVATIONS)
+            numpy.savetxt('checkpoints/' + args.exp_name+ "/ACT_conv9.txt", ACTIVATIONS, delimiter=" ",fmt='%.6f')
+            
             print(cont)
             test_true_cls = np.concatenate(test_true_cls)
             test_pred_cls = np.concatenate(test_pred_cls)
