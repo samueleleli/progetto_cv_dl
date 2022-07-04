@@ -17,125 +17,23 @@ from copy import deepcopy
 
 import configSettings
 
-# os.makedirs("results/actGradExtraction",exist_ok=True)
-
-def extract_semseg(args):
+# ******* plot grad *************
+def plot_extract_semseg(args):
     os.makedirs('checkpoints/' + args.exp_name+ "/actGradExtraction",exist_ok=True)
+    os.makedirs('checkpoints/' + args.exp_name+ "/actGradExtractionPlot",exist_ok=True)
+    os.makedirs('checkpoints/' + args.exp_name+ "/actGradExtractionPlot/actGradExtractionPlotG",exist_ok=True)
+    os.makedirs('checkpoints/' + args.exp_name+ "/actGradExtractionPlot/actGradExtractionPlotAG",exist_ok=True)
+    os.makedirs('checkpoints/' + args.exp_name+ "/actGradExtractionPlot/actGradExtractionPlotA",exist_ok=True)
+    total_areas = 9
+    args.num_classes = 9
+    test_dataset = Sinthcity(partition='test', num_points=args.num_points, test_area=args.test_area)
+    test_loader = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False, drop_last=False)
 
     ###
     if True:
         if True:
-            total_areas = 9
-            args.num_classes = 9
-            test_dataset = Sinthcity(partition='test', num_points=args.num_points, test_area=args.test_area)
-            test_loader = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False, drop_last=False)
-
-            '''
-            objs = np.load(configSettings.DATASET_OBJS)
-            labs = np.genfromtxt(configSettings.DATASET_LABS, delimiter=' ').astype("int64")
-
-            #selection
-            #idx= np.array([430, 2048, 1925, 391, 600, 2320, 2017, 772, 274, 1949, 1132, 1229, 1457, 738, 220, 2179, 604, 2276, 2371, 896, 2013, 505, 896, 1432, 972, 852, 1858, 1672, 1675, 852, 1858, 1672])
-            #idx = np.array([2452,563,1297,171,937,2288,128,1614,532,1523,1118,465,1948,1102,372,10,2378,765,394,1859,630,1924,928,460,677, 1197, 2319])
-            #idx = np.array([677])#677, 1197, 2319])
-            idx = np.array([290, 570, 113, 129])
-            #idx= np.arange(len(labs))
-            #unique and sort
-            idx= np.sort(np.unique(idx))
-            objs= objs[idx]
-            labs = labs[idx]
-
-            test_loader = zip(objs, labs)
-
-            directory="plotNEW0\\"
-            '''
-                  
             preds = np.genfromtxt('checkpoints/' + args.exp_name+ "/prediction.txt", delimiter=' ').astype("int64")
-            # preds= preds[idx]
-
-            #####
-            if not args.no_cuda:
-                device = torch.device("cuda")
-            else:
-                device = torch.device("cpu")
             
-            # Try to load models
-            if args.model == 'dgcnn_semseg':
-                model = DGCNN_semseg(args).to(device)
-            else:
-                raise Exception("Not implemented")
-            
-            model = nn.DataParallel(model)
-
-            print(os.path.join(args.model_path))
-            if args.model_path == "":
-                print(os.path.join(args.model_root, 'model_%s.t7' % test_area))
-                model.load_state_dict(torch.load(os.path.join(args.model_root, 'model_%s.t7' % test_area)))
-            else:
-                if not args.no_cuda:
-                    model.load_state_dict(torch.load(os.path.join(args.model_path)))
-                else:
-                    model.load_state_dict(torch.load(os.path.join(args.model_path),map_location = torch.device('cpu')))
-            
-            model = model.train()
-            
-            if not args.no_cuda:
-                cam = gradcam.GradCAM(model=model,
-                                      target_layer=model.module.conv9,
-                                      use_cuda=True)
-            else:
-                cam = gradcam.GradCAM(model=model,
-                                      target_layer=model.module.conv9,
-                                      use_cuda=False)
-            
-            print("Model defined...")
-            #####
-            
-            # i = 0
-            # results = []
-            # maxes = []
-            # mines = []
-
-            for cls in range(0, configSettings.OUTPUT_CHANNELS):
-                i=0
-                test_loader = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False, drop_last=False)
-                
-                for data, seg, max in test_loader:
-            
-                    # data = torch.tensor([data])
-            
-                    data = data.permute(0, 2, 1).to(device)
-                    # res, min_v, max_v, output = cam(input_tensor=data,
-                    #           target_category=cls,
-                    #           aug_smooth=False,
-                    #           eigen_smooth=False)
-                    # res_one = res[:, :].squeeze()
-                    output, a, g = cam(input_tensor=data,
-                                        target_category=cls,
-                                        aug_smooth=False,
-                                        eigen_smooth=False)
-            
-                    torch.set_printoptions(edgeitems=20, sci_mode=False)
-                    numpy.set_printoptions(edgeitems=20, suppress=True)
-            
-                    out = torch.argmax(output.squeeze())
-            
-                    # results.append((data, res_one, max, out ))
-                    # maxes.append(max_v)
-                    # mines.append(min_v)
-            
-                    if cls==0:
-                        np.save('checkpoints/' + args.exp_name+ "/actGradExtraction/act_conv5_{}.npy".format(i),a)
-                    np.save( 'checkpoints/' + args.exp_name+ "/actGradExtraction/grad_conv5_{}_tg{}.npy".format(i,cls), g)
-            
-                    print(i)
-                    i += 1 # un ciclo per ogni batch
-                    #break
-            
-                print("class " + str(cls) + " DONE")
-
-            '''
-            # ******* plot grad *************
             for cls in range(0, configSettings.OUTPUT_CHANNELS):
                 i=0
                 test_loader = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False, drop_last=False)
@@ -154,14 +52,14 @@ def extract_semseg(args):
                     Gm=[]
                     M=[]
                     m=[]
-                    for i in range(g.shape[2]):
-                        h, b = np.histogram(g[0,:,i], bins=100)
+                    for j in range(g.shape[2]):
+                        h, b = np.histogram(g[0,:,j], bins=100)
                         H.append(h)
                         B.append(b)
-                        GM.append(np.median(g[0,:,i]))
-                        Gm.append(np.mean(g[0,:,i]))
-                        M.append(np.max(g[0,:,i]))
-                        m.append(np.min(g[0,:,i]))
+                        GM.append(np.median(g[0,:,j]))
+                        Gm.append(np.mean(g[0,:,j]))
+                        M.append(np.max(g[0,:,j]))
+                        m.append(np.min(g[0,:,j]))
 
                     # m= np.min(g, axis=1)
                     # M= np.max(g, axis=1)
@@ -196,15 +94,15 @@ def extract_semseg(args):
 
                     min_v = np.min(var)
                     max_v = np.max(var)
-                    gt = labs[i]
-                    pred = preds[i]
+                    gt = seg[0] # prende le 4096 etichette associate ai punti del batch i
+                    pred = preds[i*4096:i*4096+4096, 7]
 
                     data[:, [1, 2]] = data[:, [2, 1]]
 
                     #varst = (var - min_v) / (max_v - min_v)  # +0.000001)
 
                     # simmetrizzazione
-                    abs_max_v = max(abs(min_v), abs(max_v))
+                    abs_max_v = np.maximum(abs(min_v), abs(max_v))
                     min_v = -abs_max_v
                     max_v = abs_max_v
                     varst = (var - min_v) / (max_v - min_v)  # +0.000001)
@@ -215,14 +113,16 @@ def extract_semseg(args):
                     cmap = plt.cm.get_cmap("jet")
                     varst = cmap(varst)[:, :3]
 
-                    pcd.points = o3d.utility.Vector3dVector(ply)
+                    # pcd.points = o3d.utility.Vector3dVector(ply)
+                    pcd.points = o3d.utility.Vector3dVector(ply[0][:,:3]) # ply tensore (0,4096,9), ply[0] accedo a matrice 4096x9 (9 n° feature?), prendiamo le prime tre colonne (coordinate xyz per i 4096 punti del batch)
                     pcd.colors = o3d.utility.Vector3dVector(varst)
 
-                    o3d.io.write_point_cloud(directory + "g_MED6_{}_tg{}_gt{}_p{}.ply".format(idx[i], cls, gt, pred), pcd)
+                    o3d.io.write_point_cloud('checkpoints/' + args.exp_name + "/actGradExtractionPlot/actGradExtractionPlotG/g_MED6_{}_tg{}.ply".format(i, cls), pcd)
 
                     print(i)
                     i += 1
-
+            
+            '''
             # plot gradcam
             for cls in range(0, 40):
                 i=0
@@ -315,8 +215,7 @@ def extract_semseg(args):
             
                 print(i)
                 i += 1
-                '''
-
+            '''
 
 class args(object):
     model_path= configSettings.MODEL_PATH # "models/model.cls.1024.t7" # 
@@ -343,4 +242,4 @@ class args(object):
     scheduler = configSettings.SCHEDULER
     momentum = configSettings.MOMENTUM
 
-extract_semseg(args)
+plot_extract_semseg(args)
