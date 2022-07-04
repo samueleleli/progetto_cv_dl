@@ -125,8 +125,8 @@ def extract_semseg(args):
                     # mines.append(min_v)
             
                     if cls==0:
-                        np.save('checkpoints/' + args.exp_name+ "/actGradExtraction/act_conv5_{}.npy".format(i),a)
-                    np.save( 'checkpoints/' + args.exp_name+ "/actGradExtraction/grad_conv5_{}_tg{}.npy".format(i,cls), g)
+                        np.save('checkpoints/' + args.exp_name+ "/actGradExtraction/act_conv9_{}.npy".format(i),a)
+                    np.save( 'checkpoints/' + args.exp_name+ "/actGradExtraction/grad_conv9_{}_tg{}.npy".format(i,cls), g)
             
                     print(i)
                     i += 1 # un ciclo per ogni batch

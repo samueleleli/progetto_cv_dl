@@ -114,7 +114,7 @@ def plot_extract_semseg(args):
                     varst = cmap(varst)[:, :3]
 
                     # pcd.points = o3d.utility.Vector3dVector(ply)
-                    pcd.points = o3d.utility.Vector3dVector(ply[0][:,:3]) # ply tensore (0,4096,9), ply[0] accedo a matrice 4096x9 (9 n° feature?), prendiamo le prime tre colonne (coordinate xyz per i 4096 punti del batch)
+                    pcd.points = o3d.utility.Vector3dVector(ply[0][:,:3]) # ply tensore (1,4096,9), ply[0] accedo a matrice 4096x9 (9 n° feature?), prendiamo le prime tre colonne (coordinate xyz per i 4096 punti del batch)
                     pcd.colors = o3d.utility.Vector3dVector(varst)
 
                     o3d.io.write_point_cloud('checkpoints/' + args.exp_name + "/actGradExtractionPlot/actGradExtractionPlotG/g_MED6_{}_tg{}.ply".format(i, cls), pcd)
