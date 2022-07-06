@@ -23,7 +23,7 @@ EXTRACT = False # serve nel main sem_seg per far partire il codice extract
 EVAL = True # serve nel main sem_seg per far partire il codice di test
 EXP_DIR = "test_output_np" + str(NUM_POINTS) + "_bs" + str(TEST_BATCH_SIZE) # directory dove salvare output
 UNIQUE_RESULTS = False # serve per scegliere se sovrascrivere ogni volta il file txt dei risultati o creare ogni volta un nuovo file
-
+BATCH_IDX = [179, 25, 125, 192]
 
 # variabili per TRAINING segmentazione (che noi non facciamo)
 TRAINING_DATASET = "synthcity" # scanObjectNN
