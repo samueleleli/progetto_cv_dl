@@ -41,10 +41,10 @@ def explain_act_semseg(args):
 
             # plot only activation
             i = 0
-            idx = np.array(configSettings.BATCH_IDX)
+            #idx = np.array(configSettings.BATCH_IDX)
             # for data, gt in test_loader:
             for data, seg, max in test_loader:
-                if (i in idx):
+                #if (i in idx):
                     # a = np.load("results/actGradExtraction/act_conv5_{}.npy".format(idx[i]))
                     a = np.load('checkpoints/' + args.exp_name + "/actGradExtraction/act_conv7_{}.npy".format(i))
 
@@ -80,7 +80,8 @@ def explain_act_semseg(args):
                             i), pcd)
 
                     print(i)
-                i += 1
+                    i += 1
+                #i += 1
 
 
 class args(object):

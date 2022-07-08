@@ -34,12 +34,12 @@ def plot_extract_semseg(args):
     if True:
         if True:
             preds = np.genfromtxt('checkpoints/' + args.exp_name + "/prediction.txt", delimiter=' ').astype("int64")
-            idx = np.array(configSettings.BATCH_IDX)
+            #idx = np.array(configSettings.BATCH_IDX)
             for cls in range(0, configSettings.OUTPUT_CHANNELS):
                 i = 0
                 # for data, gt in test_loader:
                 for data, seg, max in test_loader:
-                    if (i in idx):
+                    #if (i in idx):
                         # g = np.load("C:\\Users\\andrea\\Desktop\\PCmax\\classification\\actGrad_\\act_conv5_{}.npy".format(idx[i]))
                         g = np.load(
                             'checkpoints/' + args.exp_name + "/actGradExtraction/grad_conv7_{}_tg{}.npy".format(i, cls))
@@ -89,8 +89,8 @@ def plot_extract_semseg(args):
                         plt.stem(b[1:], h)
                         '''
                         gM = np.median(g, axis=1)
-                        print(g)
-                        print(gM)
+                        #print(g)
+                        #print(gM)
                         # agM = np.mean(ag, axis=1)
                         var = gM[0]
 
@@ -114,7 +114,7 @@ def plot_extract_semseg(args):
 
                         cmap = plt.cm.get_cmap("jet")
                         varst = cmap(varst)[:, :3]
-                        print(varst)
+                        #print(varst)
                         # pcd.points = o3d.utility.Vector3dVector(ply)
                         pcd.points = o3d.utility.Vector3dVector(ply[0][:,
                                                                 :3])  # ply tensore (1,4096,9), ply[0] accedo a matrice 4096x9 (9 n° feature?), prendiamo le prime tre colonne (coordinate xyz per i 4096 punti del batch)
@@ -125,7 +125,8 @@ def plot_extract_semseg(args):
                                 i, cls), pcd)
 
                         print(i)
-                    i += 1
+                        i += 1
+                    #i += 1
 
             '''
             # plot gradcam

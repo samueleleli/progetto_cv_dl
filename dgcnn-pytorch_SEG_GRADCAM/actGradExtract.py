@@ -50,7 +50,7 @@ def extract_semseg(args):
 
             directory="plotNEW0\\"
             '''
-            idx = np.array(configSettings.BATCH_IDX)
+            #idx = np.array(configSettings.BATCH_IDX)
             test_loader = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False, drop_last=False)
 
             preds = np.genfromtxt('checkpoints/' + args.exp_name + "/prediction.txt", delimiter=' ').astype("int64")
@@ -102,7 +102,7 @@ def extract_semseg(args):
             for cls in range(0, configSettings.OUTPUT_CHANNELS):
                 j = 0
                 for data, seg, max in test_loader:
-                    if (j in idx):
+                    #if (j in idx):
                         # data = torch.tensor([data])
 
                         data = data.permute(0, 2, 1).to(device)
@@ -135,7 +135,8 @@ def extract_semseg(args):
 
                         print(j)
                         # break
-                    j += 1
+                        j += 1
+                    #j += 1
                 print("class " + str(cls) + " DONE")
 
             '''

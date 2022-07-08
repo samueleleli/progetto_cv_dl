@@ -37,14 +37,14 @@ def explain_gradcam_semseg(args):
 
             # plot gradcam
             # for cls in range(0, 14):
-            idx = np.array(configSettings.BATCH_IDX)
+            #idx = np.array(configSettings.BATCH_IDX)
             for cls in range(0, configSettings.OUTPUT_CHANNELS):
                 i = 0
                 # test_loader = deepcopy(zip(objs, labs))
                 # for data, gt in test_loader:
 
                 for data, seg, max in test_loader:
-                    if (i in idx):
+                    #if (i in idx):
                         a = np.load('checkpoints/' + args.exp_name + "/actGradExtraction/act_conv7_{}.npy".format(i))
                         g = np.load(
                             'checkpoints/' + args.exp_name + "/actGradExtraction/grad_conv7_{}_tg{}.npy".format(i, cls))
@@ -89,13 +89,17 @@ def explain_gradcam_semseg(args):
 
                         pcd.points = o3d.utility.Vector3dVector(ply[0][:, :3])
                         pcd.colors = o3d.utility.Vector3dVector(varst)
-
-                        o3d.io.write_point_cloud(
-                            'checkpoints/' + args.exp_name + "/actGradExtractionPlot/actGradExtractionPlotAG/ag_median_{}_tg{}.ply".format(
-                                i, cls), pcd)
-
+                        
+                        if i < 10:
+                            o3d.io.write_point_cloud('checkpoints/' + args.exp_name + "/actGradExtractionPlot/actGradExtractionPlotAG/ag_median_00{}_tg{}.ply".format(i, cls), pcd)
+                        elif i < 100:
+                            o3d.io.write_point_cloud('checkpoints/' + args.exp_name + "/actGradExtractionPlot/actGradExtractionPlotAG/ag_median_0{}_tg{}.ply".format(i, cls), pcd)
+                        else:
+                            o3d.io.write_point_cloud('checkpoints/' + args.exp_name + "/actGradExtractionPlot/actGradExtractionPlotAG/ag_median_{}_tg{}.ply".format(i, cls), pcd)
+                        
                         print(i)
-                    i += 1
+                        i += 1
+                    #i += 1
             # #plot only activation
             # i=0
             # for data, gt in test_loader:
