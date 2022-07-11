@@ -1,3 +1,4 @@
+import itertools
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -231,10 +232,15 @@ def save_plot_GRADCAM(tg_class):
                     geometry.paint_uniform_color((1.0, 0.0, 0.0))
                     colors = np.asarray(geometry.colors)
 
-                for color in colors:
-                    esa.append("#{0:02x}{1:02x}{2:02x}".format(int(color[0]*255), int(color[1]*255), int(color[2]*255)))
+                #for color in colors:
+                for color,points in itertools.zip_longest(colors,data):
+                    if points[6] in [0, 5, 8 ]:
+                        esa.append("#{0:02x}{1:02x}{2:02x}".format(int(color[0]*255), int(color[1]*255), int(color[2]*255)))
                 
     data = np.loadtxt("checkpoints/" + configSettings.EXP_DIR + "/prediction.txt")
+    for points in data:
+        if not points[6] in [0, 5, 8 ]:
+            data.remove(points)
     x = data[:, 0]
     y = data[:, 1]
     z = data[:, 2]
@@ -242,6 +248,8 @@ def save_plot_GRADCAM(tg_class):
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, c=esa, s=0.01)
+    #color_bar = ax.scatter(x, y, z, c=esa, s=0.01)
+    #fig.colorbar(color_bar, label='Influence')
     print("Saving plot with GRADCAM...")
     plt.savefig(output_file)
 
@@ -252,4 +260,4 @@ def save_plot_GRADCAM(tg_class):
 # save_plot_area_3d_pred_map_color(False)
 # save_plot_area_3d_pred_map_color(True)
 
-# save_plot_GRADCAM(4)
+#save_plot_GRADCAM(4)

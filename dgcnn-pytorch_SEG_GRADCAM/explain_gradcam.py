@@ -1,3 +1,4 @@
+import itertools
 import os
 import argparse
 
@@ -49,6 +50,29 @@ def explain_gradcam_semseg(args):
                         g = np.load(
                             'checkpoints/' + args.exp_name + "/actGradExtraction/grad_conv7_{}_tg{}.npy".format(i, cls))
 
+                        
+                        data_final = torch.tensor([])
+                        j = 0
+                        for points,cls in itertools.zip_longest(data[0],seg[0]):
+                            print(cls)
+                            if not cls in [0, 5, 8 ]:
+                                #data_final = torch.cat((data_final,points), axis=0)
+                                #data = data[data.eq(torch.tensor(points)).all(dim=1).logical_not()]
+                                data = data[torch.arange(1, data.shape[0]+1) != j, ...]
+                                #print(data_final)
+                            j+=1
+
+                        #print(data.shape)
+                        #seg.remove(1)
+                        #seg.remove(2)
+                        #seg.remove(3)
+                        #seg.remove(4)
+                        #seg.remove(6)
+                        #seg.remove(7)
+                        #data = data_final
+                        print(data.shape)
+                        if data.shape == torch.Size([0, 4096, 9]): continue    
+
                         ag = a * g
                         agM = np.median(ag, axis=1)
 
@@ -70,7 +94,7 @@ def explain_gradcam_semseg(args):
                         max_v = np.max(var)
                         # gt = labs[i]
                         # pred = preds[i]
-
+                        
                         data[:, [1, 2]] = data[:, [2, 1]]
 
                         # varst = (var - min_v) / (max_v - min_v)  # +0.000001)
