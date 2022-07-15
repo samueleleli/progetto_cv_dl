@@ -1,10 +1,10 @@
-import itertools
 import os
 import argparse
 
 import numpy
 import numpy as np
 import torch
+#from torch._C import float32
 import torch.nn as nn
 from data import S3DIS, ArCH, Sinthcity, ModelNet40, ShapeNetPart
 from model import DGCNN_semseg, DGCNN_cls
@@ -18,6 +18,8 @@ from copy import deepcopy
 
 import paramSettings
 import configSettings
+import itertools
+
 
 
 # os.makedirs("results/gradcamPlot",exist_ok=True)
@@ -40,29 +42,34 @@ def explain_gradcam_semseg(args):
             # for cls in range(0, 14):
             #idx = np.array(configSettings.BATCH_IDX)
             for cls in range(0, configSettings.OUTPUT_CHANNELS):
+                print("Start Class " + str(cls))
                 i = 0
                 # test_loader = deepcopy(zip(objs, labs))
                 # for data, gt in test_loader:
 
                 for data, seg, max in test_loader:
                     #if (i in idx):
-                        a = np.load('checkpoints/' + args.exp_name + "/actGradExtraction/act_conv7_{}.npy".format(i))
-                        g = np.load(
-                            'checkpoints/' + args.exp_name + "/actGradExtraction/grad_conv7_{}_tg{}.npy".format(i, cls))
-
-                        
-                        data_final = torch.tensor([])
+                        select_idx = []
+                       
                         j = 0
-                        for points,cls in itertools.zip_longest(data[0],seg[0]):
-                            print(cls)
-                            if not cls in [0, 5, 8 ]:
-                                #data_final = torch.cat((data_final,points), axis=0)
-                                #data = data[data.eq(torch.tensor(points)).all(dim=1).logical_not()]
-                                data = data[torch.arange(1, data.shape[0]+1) != j, ...]
-                                #print(data_final)
-                            j+=1
-
                         #print(data.shape)
+                        for points,cls2 in itertools.zip_longest(data,seg):
+                            #print(data[0][j])
+                            for points2,cls3 in itertools.zip_longest(points,cls2):
+                              #print(points2.shape)
+                              if cls3 in [8]: 
+                                  select_idx.append(j)
+                              j+=1
+                        if len(select_idx) in [0,1,2]: 
+                          i+=1
+                          continue 
+                        indices = torch.tensor(select_idx,dtype=torch.int32)
+                        data = torch.index_select(data, 1, indices)
+                        
+                        #print(data.shape)
+                        #print(data_final.shape)
+                        #data = torch.FloatTensor(1, len(data_final), 9) 
+                        #data[0] = data_final
                         #seg.remove(1)
                         #seg.remove(2)
                         #seg.remove(3)
@@ -70,8 +77,24 @@ def explain_gradcam_semseg(args):
                         #seg.remove(6)
                         #seg.remove(7)
                         #data = data_final
-                        print(data.shape)
-                        if data.shape == torch.Size([0, 4096, 9]): continue    
+                        #print(data.shape)
+                        
+                        a = np.load('checkpoints/' + args.exp_name + "/actGradExtraction/act_conv7_{}.npy".format(i))
+                        k=0
+                        app = np.arange(len(select_idx)*512).reshape(1,512,len(select_idx)).astype('float')
+                        for el in a[0]:
+                          app[0][k] = np.take(el, select_idx)
+                          k+=1
+                        a = app
+
+                        g = np.load(
+                            'checkpoints/' + args.exp_name + "/actGradExtraction/grad_conv7_{}_tg{}.npy".format(i, cls))
+                        app = np.arange(len(select_idx)*512).reshape(1,512,len(select_idx)).astype('float')
+                        k=0
+                        for el in g[0]:
+                          app[0][k] = np.take(el, select_idx)
+                          k+=1
+                        g = app
 
                         ag = a * g
                         agM = np.median(ag, axis=1)
@@ -94,7 +117,7 @@ def explain_gradcam_semseg(args):
                         max_v = np.max(var)
                         # gt = labs[i]
                         # pred = preds[i]
-                        
+
                         data[:, [1, 2]] = data[:, [2, 1]]
 
                         # varst = (var - min_v) / (max_v - min_v)  # +0.000001)
@@ -104,13 +127,14 @@ def explain_gradcam_semseg(args):
                         min_v = -abs_max_v
                         max_v = abs_max_v
                         varst = (var - min_v) / (max_v - min_v)  # +0.000001)
-
+                        #print(varst)
                         ply = data  # numpy.stack((data, axis=-1)
                         pcd = o3d.geometry.PointCloud()
 
                         cmap = plt.cm.get_cmap("jet")
                         varst = cmap(varst)[:, :3]
-
+                        #print(varst.shape)
+                        #print(ply[0][:, :3].shape)
                         pcd.points = o3d.utility.Vector3dVector(ply[0][:, :3])
                         pcd.colors = o3d.utility.Vector3dVector(varst)
                         
