@@ -2,7 +2,7 @@ import open3d as o3d
 import numpy as np
 import plotly.graph_objects as go
 import configSettings
-name_dir = "checkpoints/"+configSettings.EXP_DIR+"/actGradExtractionPlot/actGradExtractionPlotAG_8_new/ag_median_191_tg8.ply"
+name_dir = "checkpoints/"+configSettings.EXP_DIR+"/actGradExtractionPlot/actGradExtractionPlotAG_1_new/ag_median_257_tg1.ply"
 cloud = o3d.io.read_point_cloud(name_dir)
 #cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
 points = np.asarray(cloud.points)
